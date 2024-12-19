@@ -52,7 +52,6 @@ typedef struct
     uint8_t lora_init;
 
     //SCU
-    uint8_t can_bus_init;
     uint8_t internet_modem;
     uint8_t mqtt_client_connection;
     uint8_t sd_start;

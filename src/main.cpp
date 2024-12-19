@@ -8,7 +8,9 @@
 /* User Libraries */
 #include "MPU_defs.h"
 
+/*Bluetooth Debug libraries*/
 #include "BluetoothSerial.h"
+#include <BLE_data_receive.h>
 
 #define MB1 // Uncomment a line if it is your car choice
 //#define MB2 // Uncomment a line if it is your car choice
@@ -20,9 +22,6 @@
 #ifdef MB2
   #define CAR_ID MB2_ID
 #endif
-
-//String ok = "OK";
-//String erro = "ERRO";
 
 /* GPS tool */
 TinyGPSPlus gps;
@@ -69,6 +68,7 @@ Ticker ticker1Hz;
 bool buffer_full = false;
 bool mode = false;
 bool g = false;
+bool debug_requests;
 /* Global variables */
 state_t current_state = IDLE_ST;
 //const int Channel = 0x0F;
@@ -95,7 +95,6 @@ void bluetooth_debug(){
   SerialBT.println("--------------------------------MPU--------------------------------");
   SerialBT.print("Inicialização do Lora = ");           if(bluetooth_packet.lora_init == 2)              SerialBT.println("OK");         else if(bluetooth_packet.lora_init == 1)                   SerialBT.println("ERRO");     else SerialBT.println("NO INFO");
   SerialBT.println("--------------------------------SCU--------------------------------");
-  SerialBT.print("Inicialização da CAN Bus = ");        if(bluetooth_packet.can_bus_init == 2)           SerialBT.println("OK");         else if(bluetooth_packet.can_bus_init == 1)                SerialBT.println("ERRO");     else SerialBT.println("NO INFO");
   SerialBT.print("Conexão do módulo de internet = ");   if(bluetooth_packet.internet_modem == 2)         SerialBT.println("OK");         else if(bluetooth_packet.internet_modem == 1)              SerialBT.println("ERRO");     else SerialBT.println("NO INFO");
   SerialBT.print("Conexão do cliente MQTT = ");         if(bluetooth_packet.mqtt_client_connection == 2) SerialBT.println("OK");         else if(bluetooth_packet.mqtt_client_connection == 1)      SerialBT.println("ERRO");     else SerialBT.println("NO INFO");
   SerialBT.print("Inicialização do dispositivo SD = "); if(bluetooth_packet.sd_start == 2)               SerialBT.println("OK");         else if(bluetooth_packet.sd_start == 1)                    SerialBT.println("ERRO");     else SerialBT.println("NO INFO");
@@ -195,7 +194,15 @@ void loop()
       //Serial.println("\n\n");
       break;
   }
-  bluetooth_debug();
+
+  if(SerialBT.available())
+  {
+    if(SerialBT.read() == 'NX-01')
+    {
+      Send_debug_request(debug_requests = true);
+      bluetooth_debug();
+    }
+  }
 }
 
 /* Setup Functions */
@@ -348,77 +355,32 @@ void canISR(CAN_FRAME *rxMsg)
   //   Serial.printf("Volt = %f\r\n", volatile_packet.volt);
   // }  
 
-  if(rxMsg->id==CAN_BUS_INIT_ID)
-  {
-    memcpy(&bluetooth_packet.can_bus_init, (uint8_t *)rxMsg->data.uint8, sizeof(uint8_t));
-    Serial.print("received by can_bus_id --> ");
-    Serial.println(bluetooth_packet.can_bus_init);
-  }
-
-  if(rxMsg->id==INTERNET_MODEM_ID)
+  if(rxMsg->id==MMI_ID)
   {
     memcpy(&bluetooth_packet.internet_modem, (uint8_t *)rxMsg->data.uint8, sizeof(uint8_t));
     Serial.print("received by internet_modem_id --> ");
     Serial.println(bluetooth_packet.internet_modem);
   }
 
-  if(rxMsg->id==MQTT_CLIENT_CONNECTION_ID)
+  if(rxMsg->id==TCU_ID)
   {
     memcpy(&bluetooth_packet.mqtt_client_connection, (uint8_t *)rxMsg->data.uint8, sizeof(uint8_t));
     Serial.print("received by mqtt_client_id --> ");
     Serial.println(bluetooth_packet.mqtt_client_connection);
   }
 
-  if(rxMsg->id==SD_START_ID)
+  if(rxMsg->id==SCU_ID)
   {
     memcpy(&bluetooth_packet.sd_start, (uint8_t *)rxMsg->data.uint8, sizeof(uint8_t));
     Serial.print("received by sd_start_id --> ");
     Serial.println(bluetooth_packet.sd_start);
   }
 
-  if(rxMsg->id==CHECK_SD_ID)
+  if(rxMsg->id==MPU_ID)
   {
     memcpy(&bluetooth_packet.check_sd, (uint8_t *)rxMsg->data.uint8, sizeof(uint8_t));
     Serial.print("received by check_sd_id --> ");
     Serial.println(bluetooth_packet.check_sd);
-  }
-
-  if(rxMsg->id==ACCEL_BEGIN_ID)
-  {
-    memcpy(&bluetooth_packet.accel_begin, (uint8_t *)rxMsg->data.uint8, sizeof(uint8_t));
-    Serial.print("received by accel_begin_id --> ");
-    Serial.println(bluetooth_packet.accel_begin);
-  }
-
-  if(rxMsg->id==TERMISTOR_ID)
-  {
-    memcpy(&bluetooth_packet.termistor, (uint8_t *)rxMsg->data.uint8, sizeof(uint8_t));
-    Serial.print("received by termistor_id --> ");
-    Serial.println(bluetooth_packet.termistor);
-  }
-  if(rxMsg->id==CVT_TEMPERATURE_ID)
-  {
-    memcpy(&bluetooth_packet.cvt_temperature, (uint8_t *)rxMsg->data.uint8, sizeof(uint8_t));
-    Serial.print("received by cvt_temperature_id --> ");
-    Serial.println(bluetooth_packet.cvt_temperature);
-  }
-  if(rxMsg->id==MEASURE_VOLT_ID)
-  {
-    memcpy(&bluetooth_packet.measure_volt, (uint8_t *)rxMsg->data.uint8, sizeof(uint8_t));
-    Serial.print("received by measure_volt_id --> ");
-    Serial.println(bluetooth_packet.measure_volt);
-  }
-  if(rxMsg->id==SPEED_PULSE_COUNTER_ID)
-  {
-    memcpy(&bluetooth_packet.speed_pulse_counter, (uint8_t *)rxMsg->data.uint8, sizeof(uint8_t));
-    Serial.print("received by speed_pulse_counter_id --> ");
-    Serial.println(bluetooth_packet.speed_pulse_counter);
-  }
-  if(rxMsg->id==SERVO_STATE_ID)
-  {
-    memcpy(&bluetooth_packet.servo_state, (uint8_t *)rxMsg->data.uint8, sizeof(uint8_t));
-    Serial.print("received by servo_state_id --> ");
-    Serial.println(bluetooth_packet.servo_state);
   }
 }
 
