@@ -2,10 +2,11 @@
 #define MPU_DEFS_H
 
 #include <Arduino.h>
-#include "BajaDefs/packets.h"
-#include "BajaDefs/hard_defs.h"
-#include "BajaDefs/can_defs.h"
-#include "BajaDefs/BLE_data_receive_defs.h"
+#include "packets.h"
+#include "hard_defs.h"
+#include "can_defs.h"
+
+#define MB_ID  11
 
 /* State Machines */
 typedef enum {
@@ -17,6 +18,6 @@ typedef enum {
 
 //typedef enum {SENDING, LISTENING} connectivity_states;
 
-unsigned long timer;
+//unsigned long timer;
 
 #endif

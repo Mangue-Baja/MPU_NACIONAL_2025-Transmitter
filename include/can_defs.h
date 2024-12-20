@@ -1,6 +1,8 @@
 #ifndef CAN_DEFS_H
 #define CAN_DEFS_H
 
+#include <stdint.h>
+
 /* IDs */
 #define BUFFER_SIZE     50
 #define THROTTLE_MID    0x00
@@ -30,15 +32,33 @@
 #define SCU_ID          0x308
 #define MPU_ID          0x309
 
+// #define CAN_BUS_INIT_ID             0x510
+// #define INTERNET_MODEM_ID           0x520
+// #define MQTT_CLIENT_CONNECTION_ID   0x530
+// #define SD_START_ID                 0x540
+// #define CHECK_SD_ID                 0x550
+// #define ACCEL_BEGIN_ID              0X560
+// #define TERMISTOR_ID                0X565
+// #define CVT_TEMPERATURE_ID          0x570
+// #define MEASURE_VOLT_ID             0x575
+// #define SPEED_PULSE_COUNTER_ID      0x580
+// #define SERVO_STATE_ID              0x585
+
+// #define CAN_BUS_INIT_ID             0x800
+// #define INTERNET_MODEM_ID           0x801
+// #define MQTT_CLIENT_CONNECTION_ID   0x802
+// #define SD_START_ID                 0x803
+// #define CHECK_SD_ID                 0x804
+
 typedef struct
 {
     int16_t acc_x;
     int16_t acc_y;
     int16_t acc_z;
+
     int16_t dps_x;
     int16_t dps_y;
     int16_t dps_z;
-    
 } imu_t;
     
 typedef struct

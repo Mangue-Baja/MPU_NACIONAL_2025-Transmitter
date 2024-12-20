@@ -4,9 +4,6 @@
 #include <stdio.h>
 #include <string.h>
 
-#define MB1_ID  11
-#define MB2_ID  22
-
 typedef struct
 {
     int16_t acc_x;
@@ -68,9 +65,5 @@ typedef struct
     uint16_t servo_state;
     
 } bluetooth;
-
-// Packet constantly saved
-radio_packet_t volatile_packet;
-bluetooth bluetooth_packet;
 
 #endif
