@@ -5,6 +5,7 @@
 #include "BajaDefs/packets.h"
 #include "BajaDefs/hard_defs.h"
 #include "BajaDefs/can_defs.h"
+#include "BajaDefs/BLE_data_receive_defs.h"
 
 /* State Machines */
 typedef enum {

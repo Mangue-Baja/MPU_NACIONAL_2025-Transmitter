@@ -10,7 +10,6 @@
 
 /*Bluetooth Debug libraries*/
 #include "BluetoothSerial.h"
-#include <BLE_data_receive.h>
 
 #define MB1 // Uncomment a line if it is your car choice
 //#define MB2 // Uncomment a line if it is your car choice
@@ -195,13 +194,24 @@ void loop()
       break;
   }
 
+  String receivedData = "";
+
+  
   if(SerialBT.available())
   {
-    if(SerialBT.read() == 'NX-01')
-    {
-      Send_debug_request(debug_requests = true);
-      bluetooth_debug();
-    }
+    char caractere = SerialBT.read();
+
+    if (caractere != '\n') {          // Verifica se o caractere não é uma nova linha
+            receivedData += caractere;    // Adiciona o caractere ao buffer
+        } else {                  // Quando uma nova linha é recebida
+            if (receivedData == "NX-01") {
+                Send_debug_request(debug_requests = true, txMsg);
+                bluetooth_debug();
+            } else {
+                SerialBT.println("Comando desconhecido:");
+            }
+            receivedData = "";    // Limpa o buffer
+        }
   }
 }
 
