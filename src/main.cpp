@@ -1,9 +1,12 @@
 #include <Arduino.h>
 #include <StateMachine.h>
 #include <BLE.h>
+#include <CAN.h>  
 
 /* Task Management */
 TaskHandle_t StateMachine_Task = NULL, BLEtask = NULL;
+
+uint8_t status;
 
 /* Tasks */
 void StateMachineTask(void *pvParameters);
@@ -19,8 +22,7 @@ void setup()
   if (!CAN_start_device())
     esp_restart();
   
-  uint8_t status = LORA_init();
-  Save_LORA_init_status(status);
+  status = LORA_init();
   
   GPS_init();
   
@@ -49,12 +51,16 @@ void StateMachineTask(void *pvParameters)
 void BLE_Data_Task(void *arg)
 {
   for (;;)
-  {
+  { 
     if (BLE_connected() && App_MPU_data_request())
     {
+      Save_LORA_init_status(status);
       Send_MPU_REQUEST(true);
+      
       vTaskDelay(300); // Wait the response
+      
       Send_BLE_msg();
+      CLEAR_BLE_MSG();
     } 
 
     vTaskDelay(MAX_BLE_DELAY);

@@ -13,6 +13,8 @@ bool Send_GPS_data(double _msg, uint32_t _ID);
 bool Send_MPU_REQUEST(bool _msg);
 bluetooth update_packet(void);
 
+void CLEAR_BLE_MSG(void);
+
 /* Interrupt */
 void canISR(CAN_FRAME *rxMsg);
 

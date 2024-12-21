@@ -3,7 +3,7 @@
 CANmsg txMsg(CAN_RX_id, CAN_TX_id, CAN_BPS_1000K);
 radio_packet_t can_receive_packet;
 bluetooth bluetooth_packet;
-bool mode = false;
+bool mode = false; 
 
 bool CAN_start_device(bool debug_mode)
 {
@@ -21,7 +21,7 @@ bool CAN_start_device(bool debug_mode)
    * you can set the filter in this function too:
    * txMsg.Set_Filter(uint32_t ID, uint32_t Mask, bool Extended);  */
   memset(&can_receive_packet, 0, sizeof(radio_packet_t));
-  memset(&bluetooth_packet, 1, sizeof(bluetooth));
+  CLEAR_BLE_MSG();
   return true;
 }
 
@@ -47,6 +47,11 @@ bool Send_MPU_REQUEST(bool _msg)
 bluetooth update_packet()
 {
   return bluetooth_packet;
+}
+
+void CLEAR_BLE_MSG()
+{
+  memset(&bluetooth_packet, 0, sizeof(bluetooth));
 }
 
 /* CAN functions */
