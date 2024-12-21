@@ -41,7 +41,7 @@ bool Send_MPU_REQUEST(bool _msg)
 {
   txMsg.clear(MPU_ID);
   txMsg << _msg;
-  return txMsg.write(); 
+  return txMsg.write();
 }
 
 bluetooth update_packet()
@@ -91,18 +91,22 @@ void canISR(CAN_FRAME *rxMsg)
     break;
 
   case SCU_ID:
-    memcpy(&bluetooth_packet.internet_modem, (uint8_t *)&rxMsg->data.uint8, sizeof(uint8_t));
-    Serial.printf("All data: %d\r\n", bluetooth_packet.internet_modem);
+  {
+    uint8_t recv;
 
-    bluetooth_packet.internet_modem &= 0x02;
-    bluetooth_packet.mqtt_client_connection = (bluetooth_packet.internet_modem >> 2) & 0x02;
-    bluetooth_packet.sd_start = (bluetooth_packet.internet_modem >> 4) & 0x02;
-    bluetooth_packet.check_sd = (bluetooth_packet.internet_modem >> 6) & 0x02;
+    memcpy(&recv, (uint8_t *)&rxMsg->data.uint8, sizeof(uint8_t));
+    //Serial.printf("All data: %d\r\n", recv);
 
-    //Serial.printf("internet_modem: %d\r\n", bluetooth_packet.internet_modem);
-    //Serial.printf("mqtt_client_connection: %d\r\n", bluetooth_packet.mqtt_client_connection);
-    //Serial.printf("sd_start: %d\r\n", bluetooth_packet.sd_start);
-    //Serial.printf("check_sd: %d\r\n", bluetooth_packet.check_sd);
+    bluetooth_packet.internet_modem = recv & 0x02;
+    bluetooth_packet.mqtt_client_connection = (recv >> 2) & 0x02;
+    bluetooth_packet.sd_start = (recv >> 4) & 0x02;
+    bluetooth_packet.check_sd = (recv >> 6) & 0x02;
+
+    // Serial.printf("internet_modem: %d\r\n", bluetooth_packet.internet_modem);
+    // Serial.printf("mqtt_client_connection: %d\r\n", bluetooth_packet.mqtt_client_connection);
+    // Serial.printf("sd_start: %d\r\n", bluetooth_packet.sd_start);
+    // Serial.printf("check_sd: %d\r\n", bluetooth_packet.check_sd);
     break;
+  }
   }
 }
