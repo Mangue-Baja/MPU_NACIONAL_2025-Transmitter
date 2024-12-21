@@ -129,16 +129,18 @@ void Make_JSON_packet(JsonDocument &JSON, bluetooth *msg_packet)
 
     JSON["MMI"]["ACCELEROMETER_BEGIN"] = String(msg_packet->accel_begin);
 
-    JSON["TCU"]["TERMISTOR"]       = String(msg_packet->termistor);
-    JSON["TCU"]["CVT_TEMPERATURE"] = String(msg_packet->cvt_temperature);            
-    JSON["TCU"]["VOLT"]            = String(msg_packet->measure_volt);
-    JSON["TCU"]["SPEED"]           = String(msg_packet->speed_pulse_counter);    
-    JSON["TCU"]["SERVO_STATE"]     = String(msg_packet->servo_state);
+    JSON["TCU"]["TERMISTOR"] = String(msg_packet->termistor);
+    JSON["TCU"]["CVT_TEMPERATURE"] = String(msg_packet->cvt_temperature);
+    JSON["TCU"]["VOLT"] = String(msg_packet->measure_volt);
+    JSON["TCU"]["SPEED"] = String(msg_packet->speed_pulse_counter);
+    JSON["TCU"]["SERVO_STATE"] = String((msg_packet->servo_state == 4 ? "CHOKE" : msg_packet->servo_state == 3 ? "MID"
+                                                                              : msg_packet->servo_state == 2   ? "RUN"
+                                                                                                               : "ERRO"));
 
-    JSON["SCU"]["INTERNET_MODEM"]  = String(msg_packet->internet_modem); 
+    JSON["SCU"]["INTERNET_MODEM"] = String(msg_packet->internet_modem);
     JSON["SCU"]["MQTT_CONNECTION"] = String(msg_packet->mqtt_client_connection);
-    JSON["SCU"]["SD_START"]        = String(msg_packet->sd_start);
-    JSON["SCU"]["SD_STATUS"]       = String(msg_packet->check_sd);    
+    JSON["SCU"]["SD_START"] = String(msg_packet->sd_start);
+    JSON["SCU"]["SD_STATUS"] = String(msg_packet->check_sd);
 }
 
 /* Callback when the device connects to BLE */

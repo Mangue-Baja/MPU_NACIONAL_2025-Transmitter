@@ -90,7 +90,7 @@ void canISR(CAN_FRAME *rxMsg)
     break;
 
   case TCU_ID:
-    memcpy(&bluetooth_packet.servo_state, (uint16_t *)&rxMsg->data.uint8, sizeof(uint16_t));
+    memcpy(&bluetooth_packet.servo_state, (uint8_t *)&rxMsg->data.uint8, sizeof(uint8_t));
     //Serial.printf("servo_state = %s\r\n", bluetooth_packet.servo_state == 4 ? "CHOKE" :  \
     bluetooth_packet.servo_state == 3 ? "MID" : bluetooth_packet.servo_state == 2 ? "RUN" : "ERRO");
     break;
