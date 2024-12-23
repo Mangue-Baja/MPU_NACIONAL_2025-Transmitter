@@ -39,6 +39,7 @@ void CircularBuffer_CurrentState()
     case RADIO_ST:
         //Serial.println("Radio");
 
+        Save_CAN_Data_in_Packet(&volatile_packet);        
         LORA_SendStruct(&volatile_packet, sizeof(volatile_packet));
         // if(LORA_SendStruct(&volatile_packet, sizeof(volatile_packet)))
         // Serial.println("ok");

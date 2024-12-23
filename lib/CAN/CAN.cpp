@@ -3,7 +3,7 @@
 CANmsg txMsg(CAN_RX_id, CAN_TX_id, CAN_BPS_1000K);
 radio_packet_t can_receive_packet;
 bluetooth bluetooth_packet;
-bool mode = false; 
+bool mode = false;
 
 bool CAN_start_device(bool debug_mode)
 {
@@ -28,6 +28,21 @@ bool CAN_start_device(bool debug_mode)
 void Save_LORA_init_status(uint8_t st)
 {
   bluetooth_packet.lora_init = st;
+}
+
+void Save_CAN_Data_in_Packet(radio_packet_t *packet)
+{
+  memcpy(&packet->imu_acc, (imu_acc_t *)&can_receive_packet.imu_acc, sizeof(imu_acc_t));
+  memcpy(&packet->imu_dps, (imu_dps_t *)&can_receive_packet.imu_dps, sizeof(imu_dps_t));
+
+  packet->rpm = can_receive_packet.rpm;
+  packet->speed = bluetooth_packet.speed_pulse_counter;
+  packet->temperature = bluetooth_packet.termistor;
+  packet->flags = can_receive_packet.flags;
+  packet->SOC = bluetooth_packet.measure_volt;
+  packet->cvt = bluetooth_packet.cvt_temperature;
+  packet->volt = can_receive_packet.volt;
+  packet->timestamp = millis();
 }
 
 bool Send_GPS_data(double _msg, uint32_t _ID)
@@ -64,14 +79,38 @@ void canISR(CAN_FRAME *rxMsg)
 
   switch (rxMsg->id)
   {
+  case IMU_ACC_ID:
+    memcpy(&can_receive_packet.imu_acc, (imu_acc_t *)&rxMsg->data.uint8, sizeof(imu_acc_t));
+    // Serial.printf("ACC X = %f\r\n", (float)((can_receive_packet.imu_acc.acc_x*0.061)/1000));
+    // Serial.printf("ACC Y = %f\r\n", (float)((can_receive_packet.imu_acc.acc_y*0.061)/1000));
+    // Serial.printf("ACC Z = %f\r\n", (float)((can_receive_packet.imu_acc.acc_z*0.061)/1000));
+    break;
+
+  case IMU_DPS_ID:
+    memcpy(&can_receive_packet.imu_dps, (imu_dps_t *)&rxMsg->data.uint8, sizeof(imu_dps_t));
+    // Serial.printf("DPS X = %d\r\n", can_receive_packet.imu_dps.dps_x);
+    // Serial.printf("DPS Y = %d\r\n", can_receive_packet.imu_dps.dps_y);
+    // Serial.printf("DPS Z = %d\r\n", can_receive_packet.imu_dps.dps_z);
+    break;
+
+  case RPM_ID:
+    memcpy(&can_receive_packet.rpm, (uint16_t *)&rxMsg->data.uint8, sizeof(uint16_t));
+    // Serial.printf("RPM = %d\r\n", can_receive_packet.rpm);
+    break;
+
+  case SPEED_ID:
+    memcpy(&bluetooth_packet.speed_pulse_counter, (uint8_t *)&rxMsg->data.uint8, sizeof(uint8_t));
+    // Serial.printf("Speed = %d\r\n", bluetooth_packet.speed_pulse_counter);
+    break;
+
   case TEMPERATURE_ID:
     memcpy(&bluetooth_packet.termistor, (uint8_t *)&rxMsg->data.uint8, sizeof(uint8_t));
     // Serial.printf("Motor = %d\r\n", bluetooth_packet.termistor);
     break;
 
-  case CVT_ID:
-    memcpy(&bluetooth_packet.cvt_temperature, (uint8_t *)&rxMsg->data.uint8, sizeof(uint8_t));
-    // Serial.printf("CVT = %d\r\n", bluetooth_packet.cvt_temperature);
+  case FLAGS_ID:
+    memcpy(&can_receive_packet.flags, (uint8_t *)&rxMsg->data.uint8, sizeof(uint8_t));
+    // Serial.printf("Flags = %d\r\n", can_receive_packet.flags);
     break;
 
   case SOC_ID:
@@ -79,9 +118,14 @@ void canISR(CAN_FRAME *rxMsg)
     // Serial.printf("SOC = %d\r\n", bluetooth_packet.measure_volt);
     break;
 
-  case SPEED_ID:
-    memcpy(&bluetooth_packet.speed_pulse_counter, (uint16_t *)&rxMsg->data.uint8, sizeof(uint16_t));
-    // Serial.printf("Speed = %d\r\n", bluetooth_packet.speed_pulse_counter);
+  case CVT_ID:
+    memcpy(&bluetooth_packet.cvt_temperature, (uint8_t *)&rxMsg->data.uint8, sizeof(uint8_t));
+    // Serial.printf("CVT = %d\r\n", bluetooth_packet.cvt_temperature);
+    break;
+
+  case VOLTAGE_ID:
+    memcpy(&can_receive_packet.volt, (float *)&rxMsg->data.uint8, sizeof(float));
+    // Serial.printf("Volt = %f\r\n", can_receive_packet.volt);
     break;
 
   case MMI_ID:
@@ -100,7 +144,7 @@ void canISR(CAN_FRAME *rxMsg)
     uint8_t recv;
 
     memcpy(&recv, (uint8_t *)&rxMsg->data.uint8, sizeof(uint8_t));
-    //Serial.printf("All data: %d\r\n", recv);
+    // Serial.printf("All data: %d\r\n", recv);
 
     bluetooth_packet.internet_modem = recv & 0x02;
     bluetooth_packet.mqtt_client_connection = (recv >> 2) & 0x02;
