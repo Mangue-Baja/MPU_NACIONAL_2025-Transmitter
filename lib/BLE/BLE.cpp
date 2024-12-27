@@ -1,7 +1,8 @@
 #include "BLE.h"
 
 /* Defines for debug */
-#define BLEdebug
+//#define BLEdebug
+//#define PrintJSON
 
 std::string msgBLE = "";
 bool deviceConnected = false, oldDeviceConnected = false, App_data_request = false;
@@ -29,8 +30,9 @@ void Init_BLE_Server()
     pCharacteristic = pService->createCharacteristic(
         CHARACTERISTIC_UUID,
         BLECharacteristic::PROPERTY_NOTIFY |
-            BLECharacteristic::PROPERTY_WRITE |
-            BLECharacteristic::PROPERTY_READ);
+        BLECharacteristic::PROPERTY_WRITE  |
+        BLECharacteristic::PROPERTY_READ
+    );
 
     // Create a BLE Descriptor
     // pDescr_1 = new BLEDescriptor((uint16_t)0x2901);
@@ -60,9 +62,9 @@ void Init_BLE_Server()
     pAdvertising->setScanResponse(true);
     pAdvertising->setMinPreferred(0x06); // set value to 0x00 to not advertise this parameter
     BLEDevice::startAdvertising();
-#ifdef BLEdebug
-    Serial.println("Waiting a client connection to notify...");
-#endif
+    #ifdef BLEdebug
+        Serial.println("Waiting a client connection to notify...");
+    #endif
 }
 
 /* If there is any device connected to BLE @return true */
@@ -76,9 +78,9 @@ bool BLE_connected()
     {
         // digitalWrite(BLE_DEBUG_LED, LOW);
         pServer->startAdvertising(); // restart advertising
-#ifdef BLEdebug
-        Serial.println("start advertising");
-#endif
+        #ifdef BLEdebug
+            Serial.println("start advertising");
+        #endif
         oldDeviceConnected = deviceConnected;
     }
 
@@ -107,14 +109,14 @@ void Send_BLE_msg()
     serializeJson(doc, msgBLE);
 
     /* Print data and length of the std::string */
-#ifdef PrintJSON
-    Serial.print("JSON document Size: ");
-    Serial.println(doc.size());
-    Serial.println(msgBLE.data());
-    Serial.print("JSON in std::string size: ");
-    Serial.println(msgBLE.length());
-    Serial.println();
-#endif
+    #ifdef PrintJSON
+        Serial.print("JSON document Size: ");
+        Serial.println(doc.size());
+        Serial.println(msgBLE.data());
+        Serial.print("JSON in std::string size: ");
+        Serial.println(msgBLE.length());
+        Serial.println();
+    #endif
 
     /* Set and send the value */
     pCharacteristic->setValue(msgBLE);
@@ -134,7 +136,7 @@ void Make_JSON_packet(JsonDocument &JSON, bluetooth *msg_packet)
     JSON["TCU"]["VOLT"] = String(msg_packet->measure_volt);
     JSON["TCU"]["SPEED"] = String(msg_packet->speed_pulse_counter);
     JSON["TCU"]["SERVO_STATE"] = String((msg_packet->servo_state == 4 ? "CHOKE" : msg_packet->servo_state == 3 ? "MID"
-                                                                              : msg_packet->servo_state == 2   ? "RUN"
+                                                                                : msg_packet->servo_state == 2 ? "RUN"
                                                                                                                : "ERRO"));
 
     JSON["SCU"]["INTERNET_MODEM"] = String(msg_packet->internet_modem);
@@ -146,18 +148,18 @@ void Make_JSON_packet(JsonDocument &JSON, bluetooth *msg_packet)
 /* Callback when the device connects to BLE */
 void ServerCallbacks::onConnect(BLEServer *pServer)
 {
-#ifdef BLEdebug
-    Serial.println("Client connected");
-#endif
+    #ifdef BLEdebug
+        Serial.println("Client connected");
+    #endif
     deviceConnected = true;
 }
 
 /* Callback when the device disconnects to BLE */
 void ServerCallbacks::onDisconnect(BLEServer *pServer)
 {
-#ifdef BLEdebug
-    Serial.println("Disconnected");
-#endif
+    #ifdef BLEdebug
+        Serial.println("Disconnected");
+    #endif
     deviceConnected = false;
 }
 

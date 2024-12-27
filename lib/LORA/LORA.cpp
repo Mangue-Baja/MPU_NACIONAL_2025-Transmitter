@@ -5,14 +5,14 @@ EBYTE LoRa(&LoRaUART, PIN_M0, PIN_M1, PIN_AUX);
 
 uint8_t LORA_init()
 {
-    uint8_t res;
+    uint8_t res = FAIL_RESPONSE;
 
     LoRaUART.begin(LoRa_Baud_Rate);
 
     if (LoRa.init())
-        res = 2;
+        res = SUCESS_RESPONSE;
     else
-        res = 1;
+        res = FAIL_RESPONSE;
 
     LoRa.SetAddressH(1);
     LoRa.SetAddressL(1);

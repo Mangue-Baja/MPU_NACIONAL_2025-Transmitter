@@ -32,8 +32,13 @@ void Save_LORA_init_status(uint8_t st)
 
 void Save_CAN_Data_in_Packet(radio_packet_t *packet)
 {
-  memcpy(&packet->imu_acc, (imu_acc_t *)&can_receive_packet.imu_acc, sizeof(imu_acc_t));
-  memcpy(&packet->imu_dps, (imu_dps_t *)&can_receive_packet.imu_dps, sizeof(imu_dps_t));
+  packet->imu_acc.acc_x = can_receive_packet.imu_acc.acc_x;
+  packet->imu_acc.acc_y = can_receive_packet.imu_acc.acc_y;
+  packet->imu_acc.acc_z = can_receive_packet.imu_acc.acc_z;
+
+  packet->imu_dps.dps_x = can_receive_packet.imu_dps.dps_x;
+  packet->imu_dps.dps_y = can_receive_packet.imu_dps.dps_y;
+  packet->imu_dps.dps_z = can_receive_packet.imu_dps.dps_z;
 
   packet->rpm = can_receive_packet.rpm;
   packet->speed = bluetooth_packet.speed_pulse_counter;

@@ -4,6 +4,9 @@
 #include <stdio.h>
 #include <string.h>
 
+#define SUCESS_RESPONSE 2
+#define FAIL_RESPONSE   1
+
 typedef struct
 {
     int16_t acc_x;
