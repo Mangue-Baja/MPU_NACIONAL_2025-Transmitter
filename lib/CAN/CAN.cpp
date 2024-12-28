@@ -151,10 +151,10 @@ void canISR(CAN_FRAME *rxMsg)
     memcpy(&recv, (uint8_t *)&rxMsg->data.uint8, sizeof(uint8_t));
     // Serial.printf("All data: %d\r\n", recv);
 
-    bluetooth_packet.internet_modem = recv & 0x02;
-    bluetooth_packet.mqtt_client_connection = (recv >> 2) & 0x02;
-    bluetooth_packet.sd_start = (recv >> 4) & 0x02;
-    bluetooth_packet.check_sd = (recv >> 6) & 0x02;
+    bluetooth_packet.internet_modem = recv & 0x03;
+    bluetooth_packet.mqtt_client_connection = (recv >> 2) & 0x03;
+    bluetooth_packet.sd_start = (recv >> 4) & 0x03;
+    bluetooth_packet.check_sd = (recv >> 6) & 0x03;
 
     // Serial.printf("internet_modem: %d\r\n", bluetooth_packet.internet_modem);
     // Serial.printf("mqtt_client_connection: %d\r\n", bluetooth_packet.mqtt_client_connection);
